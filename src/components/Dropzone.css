@@ -1,0 +1,33 @@
+.dropzone {
+  height: 250px;
+  position: relative;
+}
+
+.dropzone, .dropzone-files {
+  padding: 1em 0;
+  box-sizing: border-box;
+}
+
+.dropzone-files {
+  width: 100%;
+  height: 100%;
+  border-color: rgb(100, 100, 100);
+  border-style: dashed;
+  border-width: 2px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.dropzone.state-empty .dropzone-files {
+  border-color: gray;
+}
+
+.dropzone.state-dropped .dropzone-files {
+  border-color: green;
+}
+
+.dropzone.state-error .dropzone-files {
+  border-color: red;
+}

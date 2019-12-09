@@ -1,0 +1,11 @@
+.field {
+  display: flex;
+}
+
+.field > :first-child {
+  width: 200px;
+}
+
+.field > :last-child {
+  width: 100%;
+}
