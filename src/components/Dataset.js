@@ -1,16 +1,17 @@
+// import React, { useContext } from 'react'
 import React from 'react'
 import './Dataset.css'
 
-import { Button } from '@datapunt/asc-ui'
+// import SchemaContext, {BASE_URL, VERSION} from './SchemaContext'
+
+import { Button, OrderedList, ListItem } from '@datapunt/asc-ui'
 
 import { List, fromJS } from 'immutable'
-
-import { OrderedList, ListItem } from '@datapunt/asc-ui'
 
 import Table from './Table'
 import BasicProperties from './BasicProperties'
 
-// const DATASET_SCHEMA_URL = 'https://static.amsterdam.nl/schemas/dataset@v1.0'
+// const DATASET_SCHEMA_URL = `${BASE_URL}/dataset@${VERSION}`
 
 function updateDataset (dataset, onUpdate) {
   onUpdate(dataset)
@@ -38,6 +39,8 @@ function deleteTable (dataset, index, onUpdate) {
 }
 
 const Dataset = ({dataset, onUpdate}) => {
+  // const { ajv } = useContext(SchemaContext)
+
   const tables = dataset.get('tables')
   let tableList
   if (tables && tables.size) {
@@ -51,6 +54,9 @@ const Dataset = ({dataset, onUpdate}) => {
       </OrderedList>
     )
   }
+
+  // const schema = ajv.getSchema(DATASET_SCHEMA_URL).schema
+  // console.log(schema.properties)
 
   return (
     <div>

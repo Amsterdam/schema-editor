@@ -4,7 +4,12 @@ import SchemaContext from './SchemaContext'
 
 import Field from './Field'
 
-// const AMSTERDAM_SCHEMA_URL = 'https://static.amsterdam.nl/schemas/schema@v1.0'
+const labels = {
+  id: 'ID',
+  type: 'Type',
+  title: 'Title',
+  description: 'Description'
+}
 
 const BasicProperties = ({data, onUpdate}) => {
   const { compiledSchema } = useContext(SchemaContext)
@@ -13,7 +18,7 @@ const BasicProperties = ({data, onUpdate}) => {
   return (
     <div>
       {Object.entries(basicProperties).map(([property, definition]) => (
-        <Field type='string' label
+        <Field type='string' labelText={labels[property] || property}
           field={property} key={property} readOnly={property === 'type'}
           data={data} onUpdate={onUpdate} />))}
     </div>

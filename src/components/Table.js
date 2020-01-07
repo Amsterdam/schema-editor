@@ -24,7 +24,7 @@ const Table = ({table, onUpdate, onDelete}) => {
       <h3>Rows</h3>
       <Rows rows={rows}
         onUpdate={(rows) => updateRows(table, rows, onUpdate)} />
-      <Button onClick={onDelete}>Delete table</Button>
+      <Button onClick={onDelete} color='secondary' >Delete table</Button>
     </div>
   )
 }

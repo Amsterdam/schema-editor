@@ -7,12 +7,20 @@ import Field from './Field'
 
 const rowTypes = [
   {label: 'Identifier', value: 'id'},
+  {label: 'Table', value: 'table'},
+  {label: 'Dataset', value: 'dataset'},
+
   {label: 'String', value: 'string'},
   {label: 'Integer', value: 'integer'},
   {label: 'Number', value: 'number'},
   {label: 'Date & Time (ISO 8601)', value: 'date-time'},
   {label: 'URI', value: 'uri'},
-  {label: 'Boolean', value: 'boolean'}
+  {label: 'Boolean', value: 'boolean'},
+
+  {label: 'Geometry', value: 'geometry'},
+  {label: 'Polygon', value: 'polygon'},
+  {label: 'LineString', value: 'linestring'},
+  {label: 'Point', value: 'point'}
 ]
 
 const Row = ({row, onUpdate, onDelete}) => {
@@ -44,7 +52,7 @@ const Row = ({row, onUpdate, onDelete}) => {
       </td>
       <td>
         <Button onClick={onDelete}
-          size={30} variant='blank' iconSize={30} icon={<Close />} />
+          size={25} variant='blank' iconSize={20} icon={<Close />} />
       </td>
     </tr>
   )
