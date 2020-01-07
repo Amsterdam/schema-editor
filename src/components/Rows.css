@@ -1,0 +1,8 @@
+.override-asc-ui-list li {
+  list-style-type: decimal;
+  counter-increment: none;
+}
+
+.override-asc-ui-list li::before {
+  content: ''
+}

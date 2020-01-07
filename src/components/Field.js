@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react'
 import './Field.css'
 
-// import { InputComponent } from '@datapunt/asc-ui'
+import { Input } from '@datapunt/asc-ui'
 
 const getField = (data, field) => (data && data.get(field)) ? data.get(field) : ''
 
-const Field = ({ data, field, onUpdate, type, options, readOnly, label, labelText }) => {
+const Field = ({ data, field, onUpdate, type, options, readOnly, label, labelText, required }) => {
   const updateField = (value) => {
     let newData
     if (!value) {
@@ -35,7 +35,7 @@ const Field = ({ data, field, onUpdate, type, options, readOnly, label, labelTex
   let input
   if (type === 'string') {
     input = (
-      <input type='text' value={currentValue}
+      <Input type='text' value={currentValue}
         readOnly={readOnly !== undefined ? readOnly : false}
         onBlur={(event) => updateField(event.target.value)}
         onChange={(event) => setCurrentValue(event.target.value)}
@@ -59,7 +59,7 @@ const Field = ({ data, field, onUpdate, type, options, readOnly, label, labelTex
   }
 
   return (
-    <div className='field'>
+    <div className={`field ${required ? 'required' : ''}`}>
       {labelElement}
       {input}
     </div>

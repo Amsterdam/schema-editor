@@ -1,8 +1,8 @@
-// import React, { useContext } from 'react'
-import React from 'react'
+import React, { useContext } from 'react'
+
 import './Dataset.css'
 
-// import SchemaContext, {BASE_URL, VERSION} from './SchemaContext'
+import SchemaContext, {BASE_URL, VERSION} from './SchemaContext'
 
 import { Button, OrderedList, ListItem } from '@datapunt/asc-ui'
 
@@ -10,8 +10,9 @@ import { List, fromJS } from 'immutable'
 
 import Table from './Table'
 import BasicProperties from './BasicProperties'
+import SchemaProperties from './SchemaProperties'
 
-// const DATASET_SCHEMA_URL = `${BASE_URL}/dataset@${VERSION}`
+const DATASET_SCHEMA_URL = `${BASE_URL}/dataset@${VERSION}`
 
 function updateDataset (dataset, onUpdate) {
   onUpdate(dataset)
@@ -39,7 +40,7 @@ function deleteTable (dataset, index, onUpdate) {
 }
 
 const Dataset = ({dataset, onUpdate}) => {
-  // const { ajv } = useContext(SchemaContext)
+  const { ajv } = useContext(SchemaContext)
 
   const tables = dataset.get('tables')
   let tableList
@@ -55,18 +56,19 @@ const Dataset = ({dataset, onUpdate}) => {
     )
   }
 
-  // const schema = ajv.getSchema(DATASET_SCHEMA_URL).schema
-  // console.log(schema.properties)
+  const schema = ajv.getSchema(DATASET_SCHEMA_URL).schema
 
   return (
     <div>
       <h2>Dataset</h2>
       <BasicProperties data={dataset}
         onUpdate={(dataset) => updateDataset(dataset, onUpdate)} />
+      <SchemaProperties data={dataset} schema={schema} omit={['type', 'tables']}
+        onUpdate={(dataset) => updateDataset(dataset, onUpdate)} />
       <div className='tables'>
         <h3>Tables</h3>
         { tableList }
-        <Button onClick={() => addTable(dataset, onUpdate)}>Voeg tabel toe</Button>
+        <Button onClick={() => addTable(dataset, onUpdate)}>Add table</Button>
       </div>
     </div>
   )

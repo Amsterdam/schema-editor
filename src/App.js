@@ -13,7 +13,7 @@ import { ThemeProvider, GlobalStyle,
 import Dropzone from './components/Dropzone'
 import Dataset from './components/Dataset'
 import Validation from './components/Validation'
-import Schema from './components/Schema'
+import HighlightedJSON from './components/HighlightedJSON'
 
 import SchemaContext, {SCHEMA_URL} from './components/SchemaContext'
 
@@ -264,7 +264,7 @@ const App = () => {
       <GlobalStyle />
       <Header
         tall={false}
-        title='Amsterdam Schema-editor'
+        title='Amsterdam Schema Editor'
         homeLink='https://github.com/Amsterdam/amsterdam-schema'
         fullWidth={false} navigation={
           <ButtonBar>
@@ -295,7 +295,7 @@ const App = () => {
               <Dropzone options={{
                 pattern: '.json',
                 multiple: false,
-                placeholder: 'Drop Amsterdam Schema here…'
+                placeholder: 'Drop existing Amsterdam Schema JSON file here (or use the form below to create a new one)'
               }} onDropped={(data) => onDropped(data, setDataset)} />
             </div>
           </Column>
@@ -318,10 +318,14 @@ const App = () => {
                     </div>
                   ) : ''
                 }
+                <p>
+                  <strong>Important!</strong> Fields with a <span className='required'><span>yellow background</span></span> are required!
+                </p>
                 <h2>Validation</h2>
                 <Validation schema={toAmsterdamSchema(presentDataset)} />
                 <h2>Amsterdam Schema</h2>
-                <Schema schema={toAmsterdamSchema(presentDataset)} />
+                Click the Copy or Download button in the header to copy the Amsterdam Schema to your clipboard or to download a JSON file.
+                <HighlightedJSON json={toAmsterdamSchema(presentDataset)} />
               </SchemaContext.Provider>
             </div>
           </Column>

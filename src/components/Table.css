@@ -1,0 +1,8 @@
+table {
+  border-spacing: 0;
+}
+
+.right {
+  display: flex;
+  justify-content: flex-end;
+}

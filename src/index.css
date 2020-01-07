@@ -11,3 +11,9 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
     monospace;
 }
+
+.required > span,
+.required > input,
+.required > select {
+  background-color: rgba(255, 189, 8, 0.2);
+}

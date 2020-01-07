@@ -1,7 +1,7 @@
 import React, { useContext } from 'react'
 import './Validation.css'
 
-import Schema from './Schema'
+import HighlightedJSON from './HighlightedJSON'
 import SchemaContext from './SchemaContext'
 
 const Validation = ({ schema }) => {
@@ -25,7 +25,7 @@ const Validation = ({ schema }) => {
     return (
       <div className='validation-errors'>
         Fouten:
-        <Schema schema={errors} />
+        <HighlightedJSON json={errors} />
       </div>
     )
   }

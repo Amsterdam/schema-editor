@@ -1,4 +1,6 @@
 import React from 'react'
+import './Rows.css'
+
 import { fromJS } from 'immutable'
 
 import { Button } from '@datapunt/asc-ui'
@@ -23,8 +25,6 @@ function deleteRow (rows, index, onUpdate) {
 }
 
 const Rows = ({ rows, onUpdate }) => {
-  // const { ajv } = useContext(SchemaContext)
-
   let rowList
   if (rows && rows.size) {
     rowList = rows.toArray().map((row, index) => (
@@ -51,11 +51,19 @@ const Rows = ({ rows, onUpdate }) => {
           { rowList }
           <tr>
             <td colSpan='4'>
-              <Button onClick={() => addRow(rows, onUpdate)}>Voeg rij toe</Button>
+              <Button onClick={() => addRow(rows, onUpdate)}>Add row</Button>
             </td>
           </tr>
         </tbody>
       </table>
+      <p>
+        <strong>Important!</strong> Each table is expected to have at least three rows:
+      </p>
+      <ol class='override-asc-ui-list'>
+        <li>ID <code>"id"</code> with type <strong>Identifier</strong>;</li>
+        <li>ID <code>"table"</code> with type <strong>Table</strong>;</li>
+        <li>ID <code>"dataset"</code> with type <strong>Dataset</strong>.</li>
+      </ol>
     </div>
   )
 }

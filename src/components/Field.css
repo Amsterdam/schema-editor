@@ -1,5 +1,7 @@
 .field {
   display: flex;
+  padding-bottom: 3px;
+  align-items: center;
 }
 
 .field > :first-child {

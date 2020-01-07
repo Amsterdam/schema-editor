@@ -1,28 +1,14 @@
 import React, { useContext } from 'react'
 
 import SchemaContext from './SchemaContext'
+import SchemaProperties from './SchemaProperties'
 
-import Field from './Field'
-
-const labels = {
-  id: 'ID',
-  type: 'Type',
-  title: 'Title',
-  description: 'Description'
-}
-
-const BasicProperties = ({data, onUpdate}) => {
+const BasicProperties = ({data, onUpdate, omit}) => {
   const { compiledSchema } = useContext(SchemaContext)
-  const basicProperties = compiledSchema.schema.definitions.basicProperties.properties
+  const schema = compiledSchema.schema.definitions.basicProperties
 
-  return (
-    <div>
-      {Object.entries(basicProperties).map(([property, definition]) => (
-        <Field type='string' labelText={labels[property] || property}
-          field={property} key={property} readOnly={property === 'type'}
-          data={data} onUpdate={onUpdate} />))}
-    </div>
-  )
+  return <SchemaProperties data={data} schema={schema} omit={omit}
+    onUpdate={onUpdate} />
 }
 
 export default BasicProperties
