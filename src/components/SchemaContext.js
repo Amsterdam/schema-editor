@@ -25,7 +25,6 @@ const labels = {
 
 export function displayLabel (text) {
   return labels[text] || text
-
 }
 
 export const BASE_URL = 'https://schemas.data.amsterdam.nl'

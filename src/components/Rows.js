@@ -59,7 +59,7 @@ const Rows = ({ rows, onUpdate }) => {
       <p>
         <strong>Important!</strong> Each table is expected to have at least three rows:
       </p>
-      <ol class='override-asc-ui-list'>
+      <ol className='override-asc-ui-list'>
         <li>ID <code>"id"</code> with type <strong>Identifier</strong>;</li>
         <li>ID <code>"table"</code> with type <strong>Table</strong>;</li>
         <li>ID <code>"dataset"</code> with type <strong>Dataset</strong>.</li>

@@ -15,16 +15,20 @@ const Validation = ({ schema }) => {
 
   if (valid) {
     return (
-      <div className='validation-valid'>
-        Geen fouten!
+      <div>
+        <p className='validation validation-valid'>
+          The Amsterdam Schema is correct!
+        </p>
       </div>
     )
   } else {
     const errors = compiledSchema.errors
 
     return (
-      <div className='validation-errors'>
-        Fouten:
+      <div>
+        <p className='validation validation-errors'>
+          The Amsterdam Schema contains errors:
+        </p>
         <HighlightedJSON json={errors} />
       </div>
     )

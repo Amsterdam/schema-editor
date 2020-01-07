@@ -1,7 +1,15 @@
+.validation {
+  padding: 1em;
+  font-weight: bold;
+  border-radius: 5px;
+}
+
 .validation-valid {
-  color: green;
+  background-color: rgb(9, 172, 9);
+  color: white;
 }
 
 .validation-errors {
-  color: red;
+  background-color: #ec0000;
+  color: white;
 }
