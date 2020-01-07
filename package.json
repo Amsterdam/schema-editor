@@ -2,6 +2,7 @@
   "name": "schema-editor",
   "version": "0.1.0",
   "private": true,
+  "homepage" : "https://amsterdam.github.io/schema-editor",
   "dependencies": {
     "@datapunt/asc-ui": "^0.17.7",
     "ajv": "^6.10.2",
