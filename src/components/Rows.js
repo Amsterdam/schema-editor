@@ -39,11 +39,12 @@ const Rows = ({ rows, onUpdate }) => {
           <tr>
             <th>ID</th>
             <th>Type</th>
-            <th>Description</th>
+            <th>Desc.</th>
             <th>Title</th>
-            <th>Authoriztion</th>
-            <th>Provenance</th>
+            <th>Auth.</th>
+            <th>Prov.</th>
             <th>Relation</th>
+            <th>Unit</th>
           </tr>
         </thead>
         <tbody>
@@ -56,12 +57,11 @@ const Rows = ({ rows, onUpdate }) => {
         </tbody>
       </table>
       <p>
-        <strong>Important!</strong> Each table is expected to have at least three rows:
+        <strong>Important!</strong> Each table is expected to have at least two rows:
       </p>
       <ol className='override-asc-ui-list'>
         <li>ID <code>"id"</code> with type <strong>Identifier</strong>;</li>
-        <li>ID <code>"table"</code> with type <strong>Table</strong>;</li>
-        <li>ID <code>"dataset"</code> with type <strong>Dataset</strong>.</li>
+        <li>ID <code>"schema"</code> with type <strong>Schema</strong>.</li>
       </ol>
     </div>
   )
