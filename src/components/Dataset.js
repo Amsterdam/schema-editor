@@ -1,7 +1,5 @@
 import React, { useContext } from 'react'
 
-import './Dataset.css'
-
 import SchemaContext, { getSchemaUri } from './SchemaContext'
 
 import { Button, OrderedList, ListItem } from '@datapunt/asc-ui'
@@ -22,7 +20,17 @@ function addTable (dataset, onUpdate) {
   }
 
   dataset = dataset.updateIn(['tables'], (tables) => tables.push(fromJS({
-    type: 'table'
+    type: 'table',
+    rows: [
+      {
+        id: 'id',
+        type: 'id'
+      },
+      {
+        id: 'schema',
+        type: 'schema'
+      }
+    ]
   })))
   onUpdate(dataset)
 }

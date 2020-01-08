@@ -41,8 +41,9 @@ const Rows = ({ rows, onUpdate }) => {
             <th>Type</th>
             <th>Description</th>
             <th>Title</th>
-            <th>Auth.</th>
-            <th>Prov.</th>
+            <th>Authoriztion</th>
+            <th>Provenance</th>
+            <th>Relation</th>
           </tr>
         </thead>
         <tbody>

@@ -45,14 +45,18 @@ function propertyToRow (schemaUri, [id, schema]) {
 
   if (schema.$ref === `${schemaUri}#/definitions/id`) {
     type = 'id'
-  } else if (schema.$ref === `${schemaUri}#/definitions/table`) {
-    type = 'table'
-  } else if (schema.$ref === `${schemaUri}#/definitions/dataset`) {
-    type = 'dataset'
+  } else if (schema.$ref === `${schemaUri}#/definitions/schema`) {
+    type = 'schema'
   } else if (schema.type === 'string' && schema.format === 'date-time') {
     type = 'date-time'
+  } else if (schema.type === 'string' && schema.format === 'time') {
+    type = 'time'
+  } else if (schema.type === 'string' && schema.format === 'date') {
+    type = 'date'
   } else if (schema.type === 'string' && schema.format === 'uri') {
     type = 'uri'
+  } else if (schema.type === 'string' && schema.format === 'uri-reference') {
+    type = 'uri-reference'
   } else if (schema.type === 'string' && !schema.format) {
     type = 'string'
   } else if (schema.type === 'integer') {
@@ -88,13 +92,9 @@ function rowToProperty (schemaUri, row) {
     type = {
       $ref: `${schemaUri}#/definitions/id`
     }
-  } else if (row.type === 'table') {
+  } else if (row.type === 'schema') {
     type = {
-      $ref: `${schemaUri}#/definitions/table`
-    }
-  } else if (row.type === 'dataset') {
-    type = {
-      $ref: `${schemaUri}#/definitions/dataset`
+      $ref: `${schemaUri}#/definitions/schema`
     }
   } else if (row.type === 'string') {
     type = {
@@ -113,10 +113,25 @@ function rowToProperty (schemaUri, row) {
       type: 'string',
       format: 'date-time'
     }
+  } else if (row.type === 'date') {
+    type = {
+      type: 'string',
+      format: 'date'
+    }
+  } else if (row.type === 'time') {
+    type = {
+      type: 'string',
+      format: 'time'
+    }
   } else if (row.type === 'uri') {
     type = {
       type: 'string',
       format: 'uri'
+    }
+  } else if (row.type === 'uri-reference') {
+    type = {
+      type: 'string',
+      format: 'uri-reference'
     }
   } else if (row.type === 'boolean') {
     type = {
@@ -173,8 +188,7 @@ function toAmsterdamSchema (schemaUri, dataset) {
     additionalProperties: false,
     required: [
       'id',
-      'dataset',
-      'table'
+      'schema'
     ]
   }
 
@@ -237,7 +251,6 @@ const columnPush = { small: 0, medium: 0, big: 1, large: 2, xLarge: 2 }
 const App = () => {
   const [config, setConfig] = useState()
   const [schemaUri, setSchemaUri] = useState()
-  // const [loaded, setLoaded] = useState(false)
   const [valid, setValid] = useState()
   const [compiledSchema, setCompiledSchema] = useState()
 
@@ -264,7 +277,6 @@ const App = () => {
       .then((schema) => compileSchema(schema))
       .then((compiledSchema) => {
         setCompiledSchema(() => compiledSchema)
-        // setLoaded(true)
       })
   }, [schemaUri])
 
