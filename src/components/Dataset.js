@@ -2,7 +2,7 @@ import React, { useContext } from 'react'
 
 import './Dataset.css'
 
-import SchemaContext, {BASE_URL, VERSION} from './SchemaContext'
+import SchemaContext, { getSchemaUri } from './SchemaContext'
 
 import { Button, OrderedList, ListItem } from '@datapunt/asc-ui'
 
@@ -11,8 +11,6 @@ import { List, fromJS } from 'immutable'
 import Table from './Table'
 import BasicProperties from './BasicProperties'
 import SchemaProperties from './SchemaProperties'
-
-const DATASET_SCHEMA_URL = `${BASE_URL}/dataset@${VERSION}`
 
 function updateDataset (dataset, onUpdate) {
   onUpdate(dataset)
@@ -40,7 +38,8 @@ function deleteTable (dataset, index, onUpdate) {
 }
 
 const Dataset = ({dataset, onUpdate}) => {
-  const { ajv } = useContext(SchemaContext)
+  const { ajv, config } = useContext(SchemaContext)
+  const datasetSchemaUri = getSchemaUri(config, 'dataset')
 
   const tables = dataset.get('tables')
   let tableList
@@ -56,14 +55,15 @@ const Dataset = ({dataset, onUpdate}) => {
     )
   }
 
-  const schema = ajv.getSchema(DATASET_SCHEMA_URL).schema
+  const schema = ajv.getSchema(datasetSchemaUri).schema
 
   return (
     <div>
       <h2>Dataset</h2>
       <BasicProperties data={dataset}
         onUpdate={(dataset) => updateDataset(dataset, onUpdate)} />
-      <SchemaProperties data={dataset} schema={schema} omit={['type', 'tables']}
+      <SchemaProperties data={dataset} schema={schema}
+        omit={['type', 'tables']} disabled={['spatialCoordinates', 'keywords']}
         onUpdate={(dataset) => updateDataset(dataset, onUpdate)} />
       <div className='tables'>
         <h3>Tables</h3>

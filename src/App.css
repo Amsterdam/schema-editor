@@ -1,3 +1,33 @@
 .contents {
   width: 100%;
 }
+
+.centered {
+  align-items: center;
+}
+
+.padding {
+  padding: 10px;
+}
+
+.header-link {
+  display: flex;
+  align-items: center;
+}
+
+.header-link a, .header-link a:visited {
+  color: black;
+}
+
+.emoji-link {
+  text-decoration: none;
+}
+
+.emoji-link *[role='img'] {
+  padding: 5px;
+  font-size: 1.2em;
+  line-height: 1em;
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+}

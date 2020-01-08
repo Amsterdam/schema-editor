@@ -17,3 +17,14 @@ code {
 .required > select {
   background-color: rgba(255, 189, 8, 0.2);
 }
+
+.required > span {
+  padding: 5px 7px;
+  border-color: rgba(0, 0, 0, 0.5);
+  border-style: solid;
+  border-width: 1px;
+}
+
+input[readonly] {
+  opacity: 0.3;
+}

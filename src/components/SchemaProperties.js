@@ -4,7 +4,7 @@ import { omit as ramdaOmit } from 'ramda'
 import Field from './Field'
 import { displayLabel } from './SchemaContext'
 
-const SchemaProperties = ({data, onUpdate, schema, omit}) => {
+const SchemaProperties = ({data, onUpdate, schema, omit, disabled}) => {
   const required = schema.required
   let properties = schema.properties
 
@@ -16,7 +16,8 @@ const SchemaProperties = ({data, onUpdate, schema, omit}) => {
     <div>
       {Object.entries(properties).map(([property, definition]) => (
         <Field type='string' labelText={displayLabel(property)} required={required.includes(property)}
-          field={property} key={property} readOnly={property === 'type'}
+          field={property} key={property}
+          readOnly={(disabled && disabled.includes(property)) || property === 'type'}
           data={data} onUpdate={onUpdate} />))}
     </div>
   )

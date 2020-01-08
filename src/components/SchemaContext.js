@@ -27,9 +27,9 @@ export function displayLabel (text) {
   return labels[text] || text
 }
 
-export const BASE_URL = 'https://schemas.data.amsterdam.nl'
-export const VERSION = 'v1.0'
-export const SCHEMA_URL = `${BASE_URL}/schema@${VERSION}`
+export function getSchemaUri (config, path) {
+  return `${config.baseUri}/${path}@${config.version}`
+}
 
 const SchemaContext = React.createContext()
 

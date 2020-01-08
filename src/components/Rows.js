@@ -7,8 +7,6 @@ import { Button } from '@datapunt/asc-ui'
 
 import Row from './Row'
 
-// const ROWS_SCHEMA_URL = 'https://static.amsterdam.nl/schemas/row-meta-schema@v1.0'
-
 function addRow (rows, onUpdate) {
   rows = rows.push(fromJS({}))
   onUpdate(rows)
@@ -41,8 +39,8 @@ const Rows = ({ rows, onUpdate }) => {
           <tr>
             <th>ID</th>
             <th>Type</th>
-            <th>Title</th>
             <th>Description</th>
+            <th>Title</th>
             <th>Auth.</th>
             <th>Prov.</th>
           </tr>

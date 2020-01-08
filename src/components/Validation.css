@@ -5,11 +5,22 @@
 }
 
 .validation-valid {
-  background-color: rgb(9, 172, 9);
-  color: white;
+  background: repeating-linear-gradient(
+    -45deg,
+    rgba(9, 172, 9, .4),
+    rgba(9, 172, 9, .4) 10px,
+    rgba(9, 172, 9, .2) 10px,
+    rgba(9, 172, 9, .2) 20px
+  );
 }
 
 .validation-errors {
-  background-color: #ec0000;
-  color: white;
+  background: repeating-linear-gradient(
+    -45deg,
+    rgba(236, 0, 0, .4),
+    rgba(236, 0, 0, .4) 10px,
+    rgba(236, 0, 0, .2) 10px,
+    rgba(236, 0, 0, .2) 20px
+  );
 }
+

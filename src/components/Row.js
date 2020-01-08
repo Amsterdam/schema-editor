@@ -1,7 +1,9 @@
-import React from 'react'
+import React, { useContext } from 'react'
 
 import { Button } from '@datapunt/asc-ui'
 import { Close } from '@datapunt/asc-assets'
+
+import SchemaContext, { getSchemaUri } from './SchemaContext'
 
 import Field from './Field'
 
@@ -24,10 +26,16 @@ const rowTypes = [
 ]
 
 const Row = ({row, onUpdate, onDelete}) => {
+  const { ajv, config } = useContext(SchemaContext)
+  const rowMetaSchemaUri = getSchemaUri(config, 'row-meta-schema')
+  const schema = ajv.getSchema(rowMetaSchemaUri).schema
+  const rootProperty = schema.definitions.rootProperty
+  const required = rootProperty.required
+
   return (
     <tr>
       <td>
-        <Field type='string' field='id'
+        <Field type='string' field='id' required
           data={row} onUpdate={onUpdate} />
       </td>
       <td>
@@ -35,19 +43,23 @@ const Row = ({row, onUpdate, onDelete}) => {
           data={row} onUpdate={onUpdate} />
       </td>
       <td>
-        <Field type='string' field='title'
+        <Field type='string' field='description'
+          required={required.includes('description')}
           data={row} onUpdate={onUpdate} />
       </td>
       <td>
-        <Field type='string' field='description'
+        <Field type='string' field='title'
+          required={required.includes('title')}
           data={row} onUpdate={onUpdate} />
       </td>
       <td>
         <Field type='string' field='auth'
+          required={required.includes('auth')}
           data={row} onUpdate={onUpdate} />
       </td>
       <td>
         <Field type='string' field='prov'
+          required={required.includes('prov')}
           data={row} onUpdate={onUpdate} />
       </td>
       <td>

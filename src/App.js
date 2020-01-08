@@ -15,7 +15,9 @@ import Dataset from './components/Dataset'
 import Validation from './components/Validation'
 import HighlightedJSON from './components/HighlightedJSON'
 
-import SchemaContext, {SCHEMA_URL} from './components/SchemaContext'
+import SchemaContext, { getSchemaUri } from './components/SchemaContext'
+
+const CONFIG_URL = 'config.json'
 
 const emptyDataset = {
   id: '',
@@ -28,7 +30,6 @@ function loadSchema (uri) {
 }
 
 let ajv
-let compiledSchema
 
 async function compileSchema (schema) {
   ajv = new Ajv({
@@ -39,14 +40,14 @@ async function compileSchema (schema) {
   return validate
 }
 
-function propertyToRow ([id, schema]) {
+function propertyToRow (schemaUri, [id, schema]) {
   let type
 
-  if (schema.$ref === `${SCHEMA_URL}#/definitions/id`) {
+  if (schema.$ref === `${schemaUri}#/definitions/id`) {
     type = 'id'
-  } else if (schema.$ref === `${SCHEMA_URL}#/definitions/table`) {
+  } else if (schema.$ref === `${schemaUri}#/definitions/table`) {
     type = 'table'
-  } else if (schema.$ref === `${SCHEMA_URL}#/definitions/dataset`) {
+  } else if (schema.$ref === `${schemaUri}#/definitions/dataset`) {
     type = 'dataset'
   } else if (schema.type === 'string' && schema.format === 'date-time') {
     type = 'date-time'
@@ -81,19 +82,19 @@ function propertyToRow ([id, schema]) {
   }
 }
 
-function rowToProperty (row) {
+function rowToProperty (schemaUri, row) {
   let type
   if (row.type === 'id') {
     type = {
-      $ref: `${SCHEMA_URL}#/definitions/id`
+      $ref: `${schemaUri}#/definitions/id`
     }
   } else if (row.type === 'table') {
     type = {
-      $ref: `${SCHEMA_URL}#/definitions/table`
+      $ref: `${schemaUri}#/definitions/table`
     }
   } else if (row.type === 'dataset') {
     type = {
-      $ref: `${SCHEMA_URL}#/definitions/dataset`
+      $ref: `${schemaUri}#/definitions/dataset`
     }
   } else if (row.type === 'string') {
     type = {
@@ -151,21 +152,21 @@ function rowToProperty (row) {
   ]
 }
 
-function fromAmsterdamSchema (schema) {
+function fromAmsterdamSchema (schemaUri, schema) {
   const dataset = {
     ...schema,
     tables: (schema.tables || []).map((table) => ({
       ...table,
       schema: undefined,
       rows: Object.entries((table.schema && table.schema.properties) || {})
-        .map(propertyToRow)
+        .map((property) => propertyToRow(schemaUri, property))
     }))
   }
 
   return fromJS(dataset)
 }
 
-function toAmsterdamSchema (dataset) {
+function toAmsterdamSchema (schemaUri, dataset) {
   const emptyRowMetaSchema = {
     $schema: 'http://json-schema.org/draft-07/schema#',
     type: 'object',
@@ -186,7 +187,7 @@ function toAmsterdamSchema (dataset) {
       rows: undefined,
       schema: {
         ...emptyRowMetaSchema,
-        properties: table.rows && Object.fromEntries(table.rows.map(rowToProperty))
+        properties: table.rows && Object.fromEntries(table.rows.map((row) => rowToProperty(schemaUri, row)))
       }
     }))
   }
@@ -224,9 +225,9 @@ function onClearClick (event, {setDataset, resetDataset}) {
   }
 }
 
-function onDropped (data, setDataset) {
+function onDropped (schemaUri, data, setDataset) {
   const schema = JSON.parse(data.contents[0])
-  const dataset = fromAmsterdamSchema(schema)
+  const dataset = fromAmsterdamSchema(schemaUri, schema)
   setDataset(dataset)
 }
 
@@ -234,7 +235,11 @@ const columnSpan = { small: 1, medium: 2, big: 4, large: 8, xLarge: 8 }
 const columnPush = { small: 0, medium: 0, big: 1, large: 2, xLarge: 2 }
 
 const App = () => {
-  const [loaded, setLoaded] = useState(false)
+  const [config, setConfig] = useState()
+  const [schemaUri, setSchemaUri] = useState()
+  // const [loaded, setLoaded] = useState(false)
+  const [valid, setValid] = useState()
+  const [compiledSchema, setCompiledSchema] = useState()
 
   const [
     datasetState, {
@@ -250,14 +255,46 @@ const App = () => {
   const { present: presentDataset } = datasetState
 
   useEffect(() => {
-    axios.get(SCHEMA_URL)
+    if (!schemaUri) {
+      return
+    }
+
+    axios.get(schemaUri)
       .then((response) => response.data)
       .then((schema) => compileSchema(schema))
-      .then((_compiledSchema) => {
-        compiledSchema = _compiledSchema
-        setLoaded(true)
+      .then((compiledSchema) => {
+        setCompiledSchema(() => compiledSchema)
+        // setLoaded(true)
+      })
+  }, [schemaUri])
+
+  useEffect(() => {
+    axios.get(CONFIG_URL)
+      .then((response) => response.data)
+      .then((config) => {
+        setConfig(config)
+        setSchemaUri(getSchemaUri(config, 'schema'))
       })
   }, [])
+
+  let validIcon
+  if (valid !== undefined) {
+    if (valid) {
+      validIcon = (
+        <a href='#validation' className='emoji-link'>
+          <span role='img' aria-label='Validated!'>✅</span>
+        </a>
+      )
+    } else {
+      validIcon = (
+        <a href='#validation' className='emoji-link'>
+          <span role='img' aria-label='Errors found!'>❌</span>
+        </a>
+      )
+    }
+  }
+
+  const loaded = config && compiledSchema
 
   return (
     <ThemeProvider>
@@ -267,12 +304,16 @@ const App = () => {
         title='Amsterdam Schema Editor'
         homeLink='https://github.com/Amsterdam/amsterdam-schema'
         fullWidth={false} navigation={
-          <ButtonBar>
+          <ButtonBar className='centered'>
+            <div className='padding header-link'>
+              <a href='#amsterdam-schema'>View schema</a>
+              {validIcon}
+            </div>
             <Button color='primary'
-              onClick={() => copyToClipboard(toAmsterdamSchema(presentDataset))}>
+              onClick={() => copyToClipboard(toAmsterdamSchema(schemaUri, presentDataset))}>
                 Copy</Button>
             <Button color='primary'
-              onClick={() => download(toAmsterdamSchema(presentDataset))}>
+              onClick={() => download(toAmsterdamSchema(schemaUri, presentDataset))}>
                 Download</Button>
             <Button
               onClick={undo}
@@ -296,7 +337,7 @@ const App = () => {
                 pattern: '.json',
                 multiple: false,
                 placeholder: 'Drop existing Amsterdam Schema JSON file here (or use the form below to create a new one)'
-              }} onDropped={(data) => onDropped(data, setDataset)} />
+              }} onDropped={(data) => onDropped(schemaUri, data, setDataset)} />
             </div>
           </Column>
         </Row>
@@ -307,7 +348,7 @@ const App = () => {
             push={columnPush} >
             <div className='contents'>
               <SchemaContext.Provider value={{
-                ajv, compiledSchema
+                ajv, compiledSchema, config
               }}>
                 {
                   loaded ? (
@@ -321,11 +362,11 @@ const App = () => {
                 <p>
                   <strong>Important!</strong> Fields with a <span className='required'><span>yellow background</span></span> are required!
                 </p>
-                <h2>Validation</h2>
-                <Validation schema={toAmsterdamSchema(presentDataset)} />
-                <h2>Amsterdam Schema</h2>
+                <h2 id='validation'>Validation</h2>
+                <Validation schema={toAmsterdamSchema(schemaUri, presentDataset)} onValidated={setValid} />
+                <h2 id='amsterdam-schema'>Amsterdam Schema</h2>
                 Click the Copy or Download button in the header to copy the Amsterdam Schema to your clipboard or to download a JSON file.
-                <HighlightedJSON json={toAmsterdamSchema(presentDataset)} />
+                <HighlightedJSON json={toAmsterdamSchema(schemaUri, presentDataset)} />
               </SchemaContext.Provider>
             </div>
           </Column>
