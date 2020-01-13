@@ -379,6 +379,7 @@ const App = () => {
                 <h2 id='amsterdam-schema'>Amsterdam Schema</h2>
                 Click the Copy or Download button in the header to copy the Amsterdam Schema to your clipboard or to download a JSON file.
                 <HighlightedJSON json={toAmsterdamSchema(schemaUri, presentDataset)} />
+                <p>The source code of the Amsterdam Schema Editor is <a href='https://github.com/Amsterdam/schema-editor'>available on GitHub</a>.</p>
               </SchemaContext.Provider>
             </div>
           </Column>
