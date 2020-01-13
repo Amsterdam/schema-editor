@@ -207,9 +207,14 @@ function toAmsterdamSchema (schemaUri, dataset) {
   }
 }
 
-function copyToClipboard (schema) {
+function copyToClipboard (schema, setJustCopied) {
+  setJustCopied(true)
   const schemaString = JSON.stringify(schema, null, 2)
   navigator.clipboard.writeText(schemaString)
+
+  window.setTimeout(() => {
+    setJustCopied(false)
+  }, 1000)
 }
 
 function download (schema) {
@@ -253,6 +258,7 @@ const App = () => {
   const [schemaUri, setSchemaUri] = useState()
   const [valid, setValid] = useState()
   const [compiledSchema, setCompiledSchema] = useState()
+  const [justCopied, setJustCopied] = useState(false)
 
   const [
     datasetState, {
@@ -322,8 +328,8 @@ const App = () => {
               {validIcon}
             </div>
             <Button color='primary'
-              onClick={() => copyToClipboard(toAmsterdamSchema(schemaUri, presentDataset))}>
-                Copy</Button>
+              onClick={() => copyToClipboard(toAmsterdamSchema(schemaUri, presentDataset), setJustCopied)}>
+              {justCopied ? 'Copied!' : 'Copy'}</Button>
             <Button color='primary'
               onClick={() => download(toAmsterdamSchema(schemaUri, presentDataset))}>
                 Download</Button>
