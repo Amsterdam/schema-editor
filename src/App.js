@@ -335,10 +335,10 @@ const App = () => {
                 Download</Button>
             <Button
               onClick={undo}
-              disabled={!canUndo}>Undo</Button>
+              disabled={!canUndo}>❮ Undo</Button>
             <Button
               onClick={redo}
-              disabled={!canRedo}>Redo</Button>
+              disabled={!canRedo}>Redo ❯</Button>
             <Button color='secondary'
               onClick={(event) => onClearClick(event, {setDataset, resetDataset})}
               disabled={!canUndo && !canRedo}>Clear</Button>

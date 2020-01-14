@@ -78,6 +78,11 @@ const Row = ({row, onUpdate, onDelete}) => {
           data={row} onUpdate={onUpdate} />
       </td>
       <td>
+        <Field type='string' field='$comment'
+          required={required.includes('$comment')}
+          data={row} onUpdate={onUpdate} />
+      </td>
+      <td>
         {readOnlyRows.includes(rowId) ? null : <Button onClick={onDelete}
           size={25} variant='blank' iconSize={20} icon={<Close />} />}
       </td>

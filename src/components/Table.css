@@ -6,3 +6,14 @@ table {
   display: flex;
   justify-content: flex-end;
 }
+
+th {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+td .field input:focus,
+td .field select:focus {
+  min-width: 300px;
+}

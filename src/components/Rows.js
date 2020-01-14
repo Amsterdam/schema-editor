@@ -45,6 +45,7 @@ const Rows = ({ rows, onUpdate }) => {
             <th>Prov.</th>
             <th>Relation</th>
             <th>Unit</th>
+            <th>Comment</th>
           </tr>
         </thead>
         <tbody>
