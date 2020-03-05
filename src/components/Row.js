@@ -27,7 +27,7 @@ const rowTypes = [
 
 const readOnlyRows = ['id', 'schema']
 
-const Row = ({row, onUpdate, onDelete}) => {
+const Row = ({row, previewMode, onUpdate, onDelete}) => {
   const rowId = row.get('id')
 
   const { ajv, config } = useContext(SchemaContext)
@@ -35,57 +35,86 @@ const Row = ({row, onUpdate, onDelete}) => {
   const schema = ajv.getSchema(rowMetaSchemaUri).schema
 
   const rootProperty = schema.definitions.rootProperty
-  const required = rootProperty.required
+  const required = rootProperty.required || [];
 
   return (
     <tr>
       <td>
-        <Field type='string' field='id' required readOnly={readOnlyRows.includes(rowId)}
-          data={row} onUpdate={onUpdate} />
+        <Field type='string'
+          field='id'
+          required
+          readOnly={previewMode || readOnlyRows.includes(rowId)}
+          data={row}
+          onUpdate={onUpdate} />
       </td>
       <td>
-        <Field type='select' field='type' options={rowTypes}
-          data={row} onUpdate={onUpdate} />
+        <Field
+          type='select'
+          field='type'
+          readOnly={previewMode}
+          options={rowTypes}
+          data={row}
+          onUpdate={onUpdate} />
       </td>
       <td>
-        <Field type='string' field='description'
+        <Field
+          type='string'
+          field='description'
+          readOnly={previewMode}
           required={required.includes('description') && !readOnlyRows.includes(rowId)}
-          data={row} onUpdate={onUpdate} />
+          data={row}
+          onUpdate={onUpdate} />
       </td>
       <td>
-        <Field type='string' field='title'
+        <Field
+          type='string'
+          field='title'
           required={required.includes('title')}
-          data={row} onUpdate={onUpdate} />
+          readOnly={previewMode}
+          data={row}
+          onUpdate={onUpdate} />
       </td>
-      <td>
-        <Field type='string' field='auth'
+      { previewMode ? null : (<td>
+        <Field
+          type='string'
+          field='auth'
           required={required.includes('auth')}
-          data={row} onUpdate={onUpdate} />
-      </td>
-      <td>
-        <Field type='string' field='prov'
+          data={row}
+          onUpdate={onUpdate} />
+      </td>) }
+      { previewMode ? null : (<td>
+        <Field
+          type='string'
+          field='prov'
           required={required.includes('prov')}
-          data={row} onUpdate={onUpdate} />
-      </td>
-      <td>
-        <Field type='string' field='relation'
+          data={row}
+          onUpdate={onUpdate} />
+      </td>) }
+      { previewMode ? null : (<td>
+        <Field
+          type='string'
+          field='relation'
           required={required.includes('relation')}
-          data={row} onUpdate={onUpdate} />
-      </td>
+          data={row}
+          onUpdate={onUpdate} />
+      </td>) }
       <td>
-        <Field type='string' field='unit'
+        <Field
+          type='string'
+          field='unit'
           required={required.includes('unit')}
-          data={row} onUpdate={onUpdate} />
+          readOnly={previewMode}
+          data={row}
+      onUpdate={onUpdate} />
       </td>
-      <td>
-        <Field type='string' field='$comment'
-          required={required.includes('$comment')}
-          data={row} onUpdate={onUpdate} />
-      </td>
-      <td>
-        {readOnlyRows.includes(rowId) ? null : <Button onClick={onDelete}
-          size={25} variant='blank' iconSize={20} icon={<Close />} />}
-      </td>
+      { previewMode || readOnlyRows.includes(rowId) ? null : (<td>
+        <Button
+          onClick={onDelete}
+          size={25}
+          variant='blank'
+          iconSize={20}
+          icon={<Close />} />
+      </td>) }
     </tr>
   )
 }

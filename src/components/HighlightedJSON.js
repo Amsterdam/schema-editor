@@ -2,7 +2,7 @@ import React from 'react'
 import './HighlightedJSON.css'
 
 import SyntaxHighlighter from 'react-syntax-highlighter'
-import { docco } from 'react-syntax-highlighter/dist/esm/styles/hljs'
+import { docco } from 'react-syntax-highlighter/dist/cjs/styles/hljs'
 
 const HighlightedJSON = ({ json }) => {
   const jsonString = JSON.stringify(json, null, 2)

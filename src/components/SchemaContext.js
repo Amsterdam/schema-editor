@@ -9,17 +9,22 @@ const labels = {
   dateCreated: 'Date created',
   dateModified: 'Date modified',
   version: 'Version',
+  status: 'Status',
   homepage: 'Homepage',
   language: 'Language',
-  // accrualPeriodicity:
-  // spatialDescription:
-  // spatialCoordinates:
   theme: 'Theme',
+  objective: 'Objective',
   publisher: 'Publisher',
   owner: 'Owner',
+  legalBasis: 'Legal Basis',
+  contactPoint: 'Contact Point. Person and (optional) e-mail.',
+  authorizationGrantor: 'Authorization Grantor',
   keywords: 'Keywords',
-  // hasBeginning:
-  // hasEnd:
+  accrualPeriodicity: 'Accrual Periodicity',
+  // spatialDescription: 'Spatial Description',
+  // spatialCoordinates: 'Spatial Coordinates',
+  // hasBeginning: 'Has Beginning',
+  // hasEnd: 'Has End',
   crs: 'CRS'
 }
 
