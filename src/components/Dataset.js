@@ -72,18 +72,16 @@ const Dataset = ({dataset, previewMode, onUpdate}) => {
 
   return (
     <div>
-      <h2>Dataset</h2>
-      <BasicProperties
+      { previewMode ? null : (<h2>Dataset</h2>) }
+      { previewMode ? null : (<BasicProperties
         data={dataset}
-        previewMode={previewMode}
-        onUpdate={(dataset) => updateDataset(dataset, onUpdate)} />
-      <SchemaProperties
+        onUpdate={(dataset) => updateDataset(dataset, onUpdate)} />) }
+      { previewMode ? null : (<SchemaProperties
         data={dataset}
         schema={schema}
         omit={['type', 'tables']}
         disabled={['spatialCoordinates', 'keywords']}
-        previewMode={previewMode}
-        onUpdate={(dataset) => updateDataset(dataset, onUpdate)} />
+        onUpdate={(dataset) => updateDataset(dataset, onUpdate)} />) }
       <div className='tables'>
         <h3>Tables</h3>
         { tableList }
