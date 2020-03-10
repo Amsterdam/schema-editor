@@ -105,7 +105,7 @@ const Row = ({row, previewMode, onUpdate, onDelete}) => {
           required={required.includes('unit')}
           readOnly={previewMode}
           data={row}
-      onUpdate={onUpdate} />
+          onUpdate={onUpdate} />
       </td>
       { previewMode || readOnlyRows.includes(rowId) ? null : (<td>
         <Button

@@ -77,25 +77,6 @@ function onClearClick (event, {setDataset, resetDataset}) {
   }
 }
 
-function onLoadSchemaDisplay (location, schemaUri, setDataset) {
-  const searchParams = new URLSearchParams(location.search)
-  const previewSchemaUri = searchParams.get('preview') || ''
-  const editSchemaUri = searchParams.get('edit') || ''
-
-  let preview = false
-  let uri = null
-  if (previewSchemaUri !== '') {
-    preview = true
-    uri = previewSchemaUri
-  } else if (editSchemaUri !== '') {
-    uri = editSchemaUri
-  }
-
-  loadSchemaFromUri(uri, schemaUri, setDataset)
-
-  return [ uri , preview ]
-}
-
 
 function onDropped (schemaUri, data, setDataset) {
   const schema = JSON.parse(data.contents[0])
@@ -112,6 +93,8 @@ const App = () => {
   const [valid, setValid] = useState()
   const [compiledSchema, setCompiledSchema] = useState()
   const [justCopied, setJustCopied] = useState(false)
+  const [remoteSchemaUri, setRemoteSchemaUri] = useState()
+  const [previewMode, setPreviewMode] = useState()
 
   const [
     datasetState, {
@@ -148,6 +131,7 @@ const App = () => {
       })
   }, [])
 
+
   let validIcon
   if (valid !== undefined) {
     if (valid) {
@@ -167,11 +151,22 @@ const App = () => {
 
   const loaded = config && compiledSchema
 
-  let previewMode = false
-  let previewSchemaUri
-  if (loaded) {
-    [previewSchemaUri, previewMode] = onLoadSchemaDisplay(window.location, schemaUri, setDataset)
-  }
+  useEffect(() => {
+    const searchParams = new URLSearchParams(window.location.search)
+    if (searchParams.get('preview') || '') {
+      setRemoteSchemaUri(searchParams.get('preview'));
+      setPreviewMode(true)
+    } else if (searchParams.get('edit') || '') {
+      setRemoteSchemaUri(searchParams.get('edit'))
+    }
+  }, [])
+
+  useEffect(() => {
+    if (!schemaUri || !remoteSchemaUri) {
+      return
+    }
+    loadSchemaFromUri(remoteSchemaUri, schemaUri, setDataset)
+  }, [schemaUri, remoteSchemaUri])
 
   return (
     <ThemeProvider>
@@ -210,8 +205,8 @@ const App = () => {
             span={columnSpan}
             push={columnPush} >
         { previewMode ? (
-          <p className='contents'><h3>Preview of {previewSchemaUri}</h3></p>) : null }
-        { previewSchemaUri ? null : (
+          <h3>Preview of {remoteSchemaUri}</h3>) : null }
+        { remoteSchemaUri ? null : (
             <div className='contents'>
               <Dropzone options={{
                 pattern: '.json',

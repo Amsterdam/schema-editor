@@ -58,7 +58,7 @@ const Dataset = ({dataset, previewMode, onUpdate}) => {
   if (tables && tables.size) {
     tableList = (
       <OrderedList className='tables'>
-        {tables.toArray().map((table, index) => <ListItem key={index}><p><h3>Table</h3></p><Table
+        {tables.toArray().map((table, index) => <ListItem key={index}><h3>Table</h3><Table
           table={table}
           previewMode={previewMode}
           onUpdate={(table) => updateTable(dataset, table, index, onUpdate)}
