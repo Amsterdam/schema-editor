@@ -7,12 +7,13 @@ import { fromJS } from 'immutable'
 import Ajv from 'ajv'
 
 import { ThemeProvider, GlobalStyle,
-  Header, Column, Container, Row,
-  Button, ButtonBar } from '@datapunt/asc-ui'
+         Header, Column, Container, Row,
+         Button, ButtonBar, Spinner, SearchBar} from '@datapunt/asc-ui'
 
 import { loadSchema,
          fromAmsterdamSchema,
-         toAmsterdamSchema } from './components/Tools'
+         toAmsterdamSchema,
+         isValidUrl } from './components/Tools'
 import Dropzone from './components/Dropzone'
 import Dataset from './components/Dataset'
 import Validation from './components/Validation'
@@ -84,6 +85,17 @@ function onDropped (schemaUri, data, setDataset) {
   setDataset(dataset)
 }
 
+function onPreviewUrlChanged (value, setRemoteSchemaUri, setRemoteSchemaUriError) {
+    setRemoteSchemaUriError(false)
+    if (value) {
+        if (isValidUrl(value)) {
+            setRemoteSchemaUri(value)
+        } else {
+            setRemoteSchemaUriError(true)
+        }
+    }
+}
+
 const columnSpan = { small: 1, medium: 2, big: 4, large: 8, xLarge: 8 }
 const columnPush = { small: 0, medium: 0, big: 1, large: 2, xLarge: 2 }
 
@@ -95,6 +107,8 @@ const App = () => {
   const [justCopied, setJustCopied] = useState(false)
   const [remoteSchemaUri, setRemoteSchemaUri] = useState()
   const [previewMode, setPreviewMode] = useState()
+  const [remoteSchemaUriError, setRemoteSchemaUriError]= useState()
+  const [loading, setLoading] = useState()
 
   const [
     datasetState, {
@@ -154,7 +168,7 @@ const App = () => {
   useEffect(() => {
     const searchParams = new URLSearchParams(window.location.search)
     if (searchParams.get('preview') || '') {
-      setRemoteSchemaUri(searchParams.get('preview'));
+      setRemoteSchemaUri(searchParams.get('preview'))
       setPreviewMode(true)
     } else if (searchParams.get('edit') || '') {
       setRemoteSchemaUri(searchParams.get('edit'))
@@ -165,8 +179,13 @@ const App = () => {
     if (!schemaUri || !remoteSchemaUri) {
       return
     }
-    loadSchemaFromUri(remoteSchemaUri, schemaUri, setDataset)
-  }, [schemaUri, remoteSchemaUri])
+
+    if (isValidUrl(remoteSchemaUri)) {
+        loadSchemaFromUri(remoteSchemaUri, schemaUri, setDataset, setRemoteSchemaUriError, setLoading)
+    } else {
+        setRemoteSchemaUriError(true)
+    }
+  }, [schemaUri, remoteSchemaUri, setDataset, setRemoteSchemaUriError, setLoading])
 
   return (
     <ThemeProvider>
@@ -176,7 +195,19 @@ const App = () => {
         title='Amsterdam Schema Editor'
         homeLink='https://github.com/Amsterdam/amsterdam-schema'
         fullWidth={false} navigation={
-          <ButtonBar className='centered'>
+        <ButtonBar className='centered'>
+            <SearchBar
+                placeholder="Enter Schema URL to start editing"
+                value={remoteSchemaUri}
+                onChange={(value) => {
+                    if (!value) {
+                        setRemoteSchemaUriError(false)
+                    }
+                }}
+                onSubmit={(value) => {
+                    onPreviewUrlChanged(value, setRemoteSchemaUri, setRemoteSchemaUriError)
+                }}
+            />
             <div className='padding header-link'>
               <a href='#amsterdam-schema'>View schema</a>
               {validIcon}
@@ -196,7 +227,7 @@ const App = () => {
             { previewMode ? null : (<Button color='secondary'
               onClick={(event) => onClearClick(event, {setDataset, resetDataset})}
               disabled={!canUndo && !canRedo}>Clear</Button>) }
-          </ButtonBar>
+            </ButtonBar>
         } />
     <Container>
         <Row halign='flex-start'>
@@ -204,16 +235,17 @@ const App = () => {
             wrap
             span={columnSpan}
             push={columnPush} >
-        { previewMode ? (
-          <h3>Preview of {remoteSchemaUri}</h3>) : null }
-        { remoteSchemaUri ? null : (
+            { previewMode ? (
+            <h3>Preview of {remoteSchemaUri}</h3>) : null }
             <div className='contents'>
-              <Dropzone options={{
+              { loading ? <Spinner /> : null }
+              { remoteSchemaUriError ? <p className='validation validation-errors'>Incorrect URL</p> : null}
+              { remoteSchemaUri ? null : <Dropzone options={{
                 pattern: '.json',
                 multiple: false,
                 placeholder: 'Drop existing Amsterdam Schema JSON file here (or use the form below to create a new one)'
-              }} onDropped={(data) => onDropped(schemaUri, data, setDataset)} />
-            </div>) }
+                }} onDropped={(data) => onDropped(schemaUri, data, setDataset)} />}
+            </div>
           </Column>
         </Row>
         <Row halign='flex-start'>

@@ -1,8 +1,19 @@
 import axios from 'axios'
 import { fromJS } from 'immutable'
 
+export const isValidUrl = (string) => {
+    try {
+        new URL(string);
+        return true;
+    } catch (_) {
+        return false;  
+    }
+}
+
 export function loadSchema (uri) {
-  return axios.get(uri).then((response)=> response.data)
+    return axios.get(uri).then(
+        (response)=> response.data
+    )
 }
 
 export function fromAmsterdamSchema (schemaUri, schema) {
