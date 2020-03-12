@@ -22,11 +22,14 @@ function deleteRow (rows, index, onUpdate) {
   onUpdate(rows)
 }
 
-const Rows = ({ rows, onUpdate }) => {
+const Rows = ({ rows, previewMode, onUpdate }) => {
   let rowList
   if (rows && rows.size) {
     rowList = rows.toArray().map((row, index) => (
-      <Row key={index} row={row}
+      <Row
+        key={index}
+        row={row}
+        previewMode={previewMode}
         onUpdate={(row) => updateRow(rows, row, index, onUpdate)}
         onDelete={() => deleteRow(rows, index, onUpdate)} />
     ))
@@ -41,29 +44,31 @@ const Rows = ({ rows, onUpdate }) => {
             <th>Type</th>
             <th>Desc.</th>
             <th>Title</th>
-            <th>Auth.</th>
-            <th>Prov.</th>
-            <th>Relation</th>
+            { previewMode ? null :(<th>Auth.</th>) }
+            { previewMode ? null : (<th>Prov.</th>) }
+            { previewMode ? null : (<th>Relation</th>) }
             <th>Unit</th>
-            <th>Comment</th>
           </tr>
         </thead>
         <tbody>
           { rowList }
+          { previewMode ? null : (
           <tr>
             <td colSpan='4'>
               <Button onClick={() => addRow(rows, onUpdate)}>Add row</Button>
             </td>
           </tr>
+          )}
         </tbody>
       </table>
+      { previewMode ? (<hr/>) : (
       <p>
         <strong>Important!</strong> Each table is expected to have at least two rows:
-      </p>
-      <ol className='override-asc-ui-list'>
+      </p>) }
+      { previewMode ? null : (<ol className='override-asc-ui-list'>
         <li>ID <code>"id"</code> with type <strong>Identifier</strong>;</li>
         <li>ID <code>"schema"</code> with type <strong>Schema</strong>.</li>
-      </ol>
+      </ol>) }
     </div>
   )
 }

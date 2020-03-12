@@ -43,7 +43,9 @@ const Field = ({ data, field, onUpdate, type, options, readOnly, label, labelTex
     )
   } else if (type === 'select') {
     input = (
-      <select readOnly={readOnly !== undefined ? readOnly : false}
+      <select
+        readOnly={readOnly !== undefined ? readOnly : false}
+        disabled={readOnly !== undefined ? readOnly : false}
         value={currentValue}
         onBlur={(event) => updateField(event.target.value)}
         onChange={(event) => setCurrentValue(event.target.value)}>

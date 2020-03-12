@@ -12,19 +12,23 @@ function updateRows (table, rows, onUpdate) {
   onUpdate(table)
 }
 
-const Table = ({table, onUpdate, onDelete}) => {
+const Table = ({table, previewMode, onUpdate, onDelete}) => {
   const rows = table.get('rows') || fromJS([])
 
   return (
     <div className='table'>
       <BasicProperties
-        data={table} onUpdate={onUpdate} />
+        data={table}
+        previewMode={previewMode}
+        onUpdate={onUpdate} />
       <h3>Rows</h3>
       <Rows rows={rows}
-        onUpdate={(rows) => updateRows(table, rows, onUpdate)} />
+            previewMode={previewMode}
+            onUpdate={(rows) => updateRows(table, rows, onUpdate)} />
+      { previewMode ? '' : (
       <div className='right'>
         <Button onClick={onDelete} color='secondary' >Delete table</Button>
-      </div>
+      </div>) }
     </div>
   )
 }

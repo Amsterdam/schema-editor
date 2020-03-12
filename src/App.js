@@ -7,13 +7,18 @@ import { fromJS } from 'immutable'
 import Ajv from 'ajv'
 
 import { ThemeProvider, GlobalStyle,
-  Header, Column, Container, Row,
-  Button, ButtonBar } from '@datapunt/asc-ui'
+         Header, Column, Container, Row,
+         Button, ButtonBar, Spinner, SearchBar} from '@datapunt/asc-ui'
 
+import { loadSchema,
+         fromAmsterdamSchema,
+         toAmsterdamSchema,
+         isValidUrl } from './components/Tools'
 import Dropzone from './components/Dropzone'
 import Dataset from './components/Dataset'
 import Validation from './components/Validation'
 import HighlightedJSON from './components/HighlightedJSON'
+import loadSchemaFromUri from './components/SchemaLoader'
 
 import SchemaContext, { getSchemaUri } from './components/SchemaContext'
 
@@ -22,11 +27,6 @@ const CONFIG_URL = 'config.json'
 const emptyDataset = {
   id: '',
   type: 'dataset'
-}
-
-function loadSchema (uri) {
-  return axios.get(uri)
-    .then((response) => response.data)
 }
 
 let ajv
@@ -40,172 +40,6 @@ async function compileSchema (schema) {
   return validate
 }
 
-function propertyToRow (schemaUri, [id, schema]) {
-  let type
-
-  if (schema.$ref === `${schemaUri}#/definitions/id`) {
-    type = 'id'
-  } else if (schema.$ref === `${schemaUri}#/definitions/schema`) {
-    type = 'schema'
-  } else if (schema.type === 'string' && schema.format === 'date-time') {
-    type = 'date-time'
-  } else if (schema.type === 'string' && schema.format === 'time') {
-    type = 'time'
-  } else if (schema.type === 'string' && schema.format === 'date') {
-    type = 'date'
-  } else if (schema.type === 'string' && schema.format === 'uri') {
-    type = 'uri'
-  } else if (schema.type === 'string' && schema.format === 'uri-reference') {
-    type = 'uri-reference'
-  } else if (schema.type === 'string' && !schema.format) {
-    type = 'string'
-  } else if (schema.type === 'integer') {
-    type = 'integer'
-  } else if (schema.type === 'number') {
-    type = 'number'
-  } else if (schema.type === 'boolean') {
-    type = 'boolean'
-  } else if (schema.$ref === 'https://geojson.org/schema/Geometry.json') {
-    type = 'geometry'
-  } else if (schema.$ref === 'https://geojson.org/schema/Polygon.json') {
-    type = 'polygon'
-  } else if (schema.$ref === 'https://geojson.org/schema/LineString.json') {
-    type = 'linestring'
-  } else if (schema.$ref === 'https://geojson.org/schema/Point.json') {
-    type = 'point'
-  } else {
-    throw new Error(`Can't create row from: ${JSON.stringify(schema)}`)
-  }
-
-  return {
-    id,
-    ...schema,
-    type,
-    $ref: undefined,
-    format: undefined
-  }
-}
-
-function rowToProperty (schemaUri, row) {
-  let type
-  if (row.type === 'id') {
-    type = {
-      $ref: `${schemaUri}#/definitions/id`
-    }
-  } else if (row.type === 'schema') {
-    type = {
-      $ref: `${schemaUri}#/definitions/schema`
-    }
-  } else if (row.type === 'string') {
-    type = {
-      type: 'string'
-    }
-  } else if (row.type === 'integer') {
-    type = {
-      type: 'string'
-    }
-  } else if (row.type === 'number') {
-    type = {
-      type: 'number'
-    }
-  } else if (row.type === 'date-time') {
-    type = {
-      type: 'string',
-      format: 'date-time'
-    }
-  } else if (row.type === 'date') {
-    type = {
-      type: 'string',
-      format: 'date'
-    }
-  } else if (row.type === 'time') {
-    type = {
-      type: 'string',
-      format: 'time'
-    }
-  } else if (row.type === 'uri') {
-    type = {
-      type: 'string',
-      format: 'uri'
-    }
-  } else if (row.type === 'uri-reference') {
-    type = {
-      type: 'string',
-      format: 'uri-reference'
-    }
-  } else if (row.type === 'boolean') {
-    type = {
-      type: 'boolean'
-    }
-  } else if (row.type === 'geometry') {
-    type = {
-      $ref: 'https://geojson.org/schema/Geometry.json'
-    }
-  } else if (row.type === 'polygon') {
-    type = {
-      $ref: 'https://geojson.org/schema/Polygon.json'
-    }
-  } else if (row.type === 'linestring') {
-    type = {
-      $ref: 'https://geojson.org/schema/LineString.json'
-    }
-  } else if (row.type === 'point') {
-    type = {
-      $ref: 'https://geojson.org/schema/Point.json'
-    }
-  }
-
-  return [
-    row.id,
-    {
-      ...row,
-      $ref: undefined,
-      type: undefined,
-      id: undefined,
-      ...type
-    }
-  ]
-}
-
-function fromAmsterdamSchema (schemaUri, schema) {
-  const dataset = {
-    ...schema,
-    tables: (schema.tables || []).map((table) => ({
-      ...table,
-      schema: undefined,
-      rows: Object.entries((table.schema && table.schema.properties) || {})
-        .map((property) => propertyToRow(schemaUri, property))
-    }))
-  }
-
-  return fromJS(dataset)
-}
-
-function toAmsterdamSchema (schemaUri, dataset) {
-  const emptyRowMetaSchema = {
-    $schema: 'http://json-schema.org/draft-07/schema#',
-    type: 'object',
-    additionalProperties: false,
-    required: [
-      'id',
-      'schema'
-    ]
-  }
-
-  const schema = dataset.toJS()
-
-  return {
-    ...schema,
-    tables: (schema.tables || []).map((table) => ({
-      ...table,
-      rows: undefined,
-      schema: {
-        ...emptyRowMetaSchema,
-        properties: table.rows && Object.fromEntries(table.rows.map((row) => rowToProperty(schemaUri, row)))
-      }
-    }))
-  }
-}
 
 function copyToClipboard (schema, setJustCopied) {
   setJustCopied(true)
@@ -244,10 +78,22 @@ function onClearClick (event, {setDataset, resetDataset}) {
   }
 }
 
+
 function onDropped (schemaUri, data, setDataset) {
   const schema = JSON.parse(data.contents[0])
   const dataset = fromAmsterdamSchema(schemaUri, schema)
   setDataset(dataset)
+}
+
+function onPreviewUrlChanged (value, setRemoteSchemaUri, setRemoteSchemaUriError) {
+    setRemoteSchemaUriError(false)
+    if (value) {
+        if (isValidUrl(value)) {
+            setRemoteSchemaUri(value)
+        } else {
+            setRemoteSchemaUriError(true)
+        }
+    }
 }
 
 const columnSpan = { small: 1, medium: 2, big: 4, large: 8, xLarge: 8 }
@@ -259,6 +105,10 @@ const App = () => {
   const [valid, setValid] = useState()
   const [compiledSchema, setCompiledSchema] = useState()
   const [justCopied, setJustCopied] = useState(false)
+  const [remoteSchemaUri, setRemoteSchemaUri] = useState()
+  const [previewMode, setPreviewMode] = useState()
+  const [remoteSchemaUriError, setRemoteSchemaUriError]= useState()
+  const [loading, setLoading] = useState()
 
   const [
     datasetState, {
@@ -295,6 +145,7 @@ const App = () => {
       })
   }, [])
 
+
   let validIcon
   if (valid !== undefined) {
     if (valid) {
@@ -314,6 +165,28 @@ const App = () => {
 
   const loaded = config && compiledSchema
 
+  useEffect(() => {
+    const searchParams = new URLSearchParams(window.location.search)
+    if (searchParams.get('preview') || '') {
+      setRemoteSchemaUri(searchParams.get('preview'))
+      setPreviewMode(true)
+    } else if (searchParams.get('edit') || '') {
+      setRemoteSchemaUri(searchParams.get('edit'))
+    }
+  }, [])
+
+  useEffect(() => {
+    if (!schemaUri || !remoteSchemaUri) {
+      return
+    }
+
+    if (isValidUrl(remoteSchemaUri)) {
+        loadSchemaFromUri(remoteSchemaUri, schemaUri, setDataset, setRemoteSchemaUriError, setLoading)
+    } else {
+        setRemoteSchemaUriError(true)
+    }
+  }, [schemaUri, remoteSchemaUri, setDataset, setRemoteSchemaUriError, setLoading])
+
   return (
     <ThemeProvider>
       <GlobalStyle />
@@ -322,7 +195,19 @@ const App = () => {
         title='Amsterdam Schema Editor'
         homeLink='https://github.com/Amsterdam/amsterdam-schema'
         fullWidth={false} navigation={
-          <ButtonBar className='centered'>
+        <ButtonBar className='centered'>
+            <SearchBar
+                placeholder="Enter Schema URL to start editing"
+                value={remoteSchemaUri}
+                onChange={(value) => {
+                    if (!value) {
+                        setRemoteSchemaUriError(false)
+                    }
+                }}
+                onSubmit={(value) => {
+                    onPreviewUrlChanged(value, setRemoteSchemaUri, setRemoteSchemaUriError)
+                }}
+            />
             <div className='padding header-link'>
               <a href='#amsterdam-schema'>View schema</a>
               {validIcon}
@@ -333,29 +218,33 @@ const App = () => {
             <Button color='primary'
               onClick={() => download(toAmsterdamSchema(schemaUri, presentDataset))}>
                 Download</Button>
-            <Button
+            { previewMode ? null : (<Button
               onClick={undo}
-              disabled={!canUndo}>❮ Undo</Button>
-            <Button
+              disabled={!canUndo}>❮ Undo</Button>) }
+            { previewMode ? null : (<Button
               onClick={redo}
-              disabled={!canRedo}>Redo ❯</Button>
-            <Button color='secondary'
+              disabled={!canRedo}>Redo ❯</Button>) }
+            { previewMode ? null : (<Button color='secondary'
               onClick={(event) => onClearClick(event, {setDataset, resetDataset})}
-              disabled={!canUndo && !canRedo}>Clear</Button>
-          </ButtonBar>
+              disabled={!canUndo && !canRedo}>Clear</Button>) }
+            </ButtonBar>
         } />
-      <Container>
+    <Container>
         <Row halign='flex-start'>
           <Column
             wrap
             span={columnSpan}
             push={columnPush} >
+            { previewMode ? (
+            <h3>Preview of {remoteSchemaUri}</h3>) : null }
             <div className='contents'>
-              <Dropzone options={{
+              { loading ? <Spinner /> : null }
+              { remoteSchemaUriError ? <p className='validation validation-errors'>Incorrect URL</p> : null}
+              { remoteSchemaUri ? null : <Dropzone options={{
                 pattern: '.json',
                 multiple: false,
                 placeholder: 'Drop existing Amsterdam Schema JSON file here (or use the form below to create a new one)'
-              }} onDropped={(data) => onDropped(schemaUri, data, setDataset)} />
+                }} onDropped={(data) => onDropped(schemaUri, data, setDataset)} />}
             </div>
           </Column>
         </Row>
@@ -373,6 +262,7 @@ const App = () => {
                     <div>
                       <Dataset
                         dataset={presentDataset}
+                        previewMode={previewMode}
                         onUpdate={setDataset} />
                     </div>
                   ) : ''
